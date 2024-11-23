@@ -63,9 +63,13 @@ module.exports = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 async function findMessages(filter: FilterQuery<Message>) {
-  return messagesToIds(await Messages.find(filter, {_id: 0}).limit(200).select("messageID").lean());
+  const messages = await Messages.find(filter, { _id: 0 })
+    .limit(200)
+    .select("messageID")
+    .lean(); // Plain objects
+  return messagesToIds(messages);
 }
 
-function messagesToIds(messages: (Message & Document<any, any>)[]) {
-  return messages.map((message) => message.messageID)
+function messagesToIds(messages: { messageID: string }[]) {
+  return messages.map((message) => message.messageID);
 }
